@@ -1,12 +1,14 @@
 name = "Curated"
 defaultTargets = ["Curated"]
 
-# The base branch carries the cases and needs nothing but Lean itself, because
-# the tactic it binds -- `grind` -- is part of core. Each backend lives on its
-# own branch, which adds exactly the dependency that backend needs and rebinds
-# `benchmark_tactic` to call it. Nothing here mediates that call.
+# Crush declares no dependencies of its own, so this is the whole graph. A
+# driver measuring a working tree overwrites this checkout with it, which is
+# why the pin only has to resolve.
 
-# Only the root module is a default target, so `lake build` compiles the
-# harness without elaborating any case. A case runs when a driver names it.
+[[require]]
+name = "crush"
+git = "https://github.com/AD1024/lean-crush"
+rev = "ca42ca71eedae571016f32751d3267bc198eb3ff"
+
 [[lean_lib]]
 name = "Curated"
