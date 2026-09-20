@@ -1,27 +1,16 @@
-import Lean
+import Duper
 
 /-!
-# Case harness
+# Duper lane
 
-Every case closes its goal with `benchmark_tactic`. That one tactic is the
-seam: a driver measuring a particular backend regenerates the case with its own
-import at the top and binds `benchmark_tactic` to call that backend directly.
-The goal text is never rewritten, so every backend sees exactly the same
-obligation with exactly the same premises.
-
-Bound here to `grind`, which needs nothing beyond Lean itself. That makes the
-suite runnable straight from a checkout, and makes the default lane one of the
-baselines rather than a placeholder.
+Binds `benchmark_tactic` to Duper directly, with every local hypothesis and any
+premises the case names. No preprocessing stands between the goal and Duper.
 -/
 
 open Lean Elab Tactic
 
-private def runBenchmarkGrind (premises : TSyntaxArray `term) : TacticM Unit := do
-  let params : TSyntaxArray `Lean.Parser.Tactic.grindParam ←
-    premises.mapM fun premise => do
-      let premise : TSyntax `term := ⟨premise⟩
-      `(Lean.Parser.Tactic.grindParam| $(premise):term)
-  let tactic ← `(tactic| grind [$params,*])
+private def runBenchmarkDuper (premises : TSyntaxArray `term) : TacticM Unit := do
+  let tactic ← `(tactic| duper [*, $premises,*])
   let start ← IO.monoMsNow
   try
     evalTactic tactic
@@ -34,5 +23,5 @@ syntax "benchmark_tactic" : tactic
 syntax "benchmark_tactic" "[" term,* "]" : tactic
 
 elab_rules : tactic
-  | `(tactic| benchmark_tactic) => runBenchmarkGrind #[]
-  | `(tactic| benchmark_tactic [$premises,*]) => runBenchmarkGrind premises
+  | `(tactic| benchmark_tactic) => runBenchmarkDuper #[]
+  | `(tactic| benchmark_tactic [$premises,*]) => runBenchmarkDuper premises
