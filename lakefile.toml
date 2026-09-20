@@ -1,12 +1,13 @@
 name = "Curated"
 defaultTargets = ["Curated"]
 
-# The base branch carries the cases and needs nothing but Lean itself, because
-# the tactic it binds -- `grind` -- is part of core. Each backend lives on its
-# own branch, which adds exactly the dependency that backend needs and rebinds
-# `benchmark_tactic` to call it. Nothing here mediates that call.
+# The `no_mathlib` branch, which is what keeps this dependency graph small
+# enough to share a toolchain with the other lanes.
 
-# Only the root module is a default target, so `lake build` compiles the
-# harness without elaborating any case. A case runs when a driver names it.
+[[require]]
+name = "«Smt»"
+git = "https://github.com/ufmg-smite/lean-smt.git"
+rev = "e50256657e5d213241005bcf353f28d13f3e6ea7"
+
 [[lean_lib]]
 name = "Curated"
