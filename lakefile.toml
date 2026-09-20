@@ -1,12 +1,14 @@
 name = "Curated"
 defaultTargets = ["Curated"]
 
-# The base branch carries the cases and needs nothing but Lean itself, because
-# the tactic it binds -- `grind` -- is part of core. Each backend lives on its
-# own branch, which adds exactly the dependency that backend needs and rebinds
-# `benchmark_tactic` to call it. Nothing here mediates that call.
+# lean-auto on its own. This lane sends the monomorphized goal to an SMT
+# solver, so Duper is not in the picture and is deliberately absent: a backend
+# this lane does not use has no business in its environment.
 
-# Only the root module is a default target, so `lake build` compiles the
-# harness without elaborating any case. A case runs when a driver names it.
+[[require]]
+name = "auto"
+git = "https://github.com/leanprover-community/lean-auto.git"
+rev = "1175ff6b958ad9513fe4830f9fca11ebe59eb78d"
+
 [[lean_lib]]
 name = "Curated"
